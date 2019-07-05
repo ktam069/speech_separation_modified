@@ -3,13 +3,9 @@ import cv2
 import pandas as pd
 import os
 
-cat_train = pd.read_csv('../audio/catalog/avspeech_train.csv')
 frame_path = './frames/'
 output_dir = './face_input'
-detect_range = (0,20)
-
-if not os.path.isdir('./face_input'):
-    os.mkdir('./face_input')
+detect_range = (0,2)
 
 def bounding_box_check(faces,x,y):
     # check the center
@@ -31,7 +27,7 @@ def bounding_box_check(faces,x,y):
             continue
         return bounding_box
 
-def face_detect(file,detector,frame_path=frame_path,cat_train=cat_train):
+def face_detect(file,detector,cat_train,frame_path=frame_path):
     name = file.replace('.jpg', '').split('-')
     log = cat_train.iloc[int(name[0])]
     x = log['pos_x']
@@ -58,15 +54,22 @@ def face_detect(file,detector,frame_path=frame_path,cat_train=cat_train):
     #plt.imshow(crop_img)
     #plt.show()
 
+def mtcnn_detect(detect_range=detect_range):
+    cat_train = pd.read_csv('../audio/catalog/avspeech_train.csv')
+    if not os.path.isdir('./face_input'):
+        os.mkdir('./face_input')
 
-detector = MTCNN()
-for i in range(detect_range[0],detect_range[1]):
-    for j in range(1,76):
-        file_name = "%d-%02d.jpg"%(i, j)
-        if (not os.path.exists('%s%s' % (frame_path, file_name))):
-            print('cannot find input: ' + '%s%s' % (frame_path, file_name))
-            continue
-        face_detect(file_name, detector)
+    detector = MTCNN()
+    for i in range(detect_range[0],detect_range[1]):
+        for j in range(1,76):
+            file_name = "%d-%02d.jpg"%(i, j)
+            if (not os.path.exists('%s%s' % (frame_path, file_name))):
+                print('cannot find input: ' + '%s%s' % (frame_path, file_name))
+                continue
+            face_detect(file_name, detector, cat_train)
 
+
+if __name__ == '__main__':
+    mtcnn_detect()
 
 
