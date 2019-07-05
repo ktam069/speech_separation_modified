@@ -1,3 +1,10 @@
+# Changes
+Steps 2-5* can be run by calling:
+```
+python download_dataset.py
+```
+*Step 6 is currently commented out - not sure how it works.
+
 # Instruction for generating data
 
 Following are the steps to generate training and testing data.  There are several parameters to change in order to match different purpose. 
