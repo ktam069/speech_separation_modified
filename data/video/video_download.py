@@ -4,8 +4,13 @@ from __future__ import print_function
 import sys
 import os
 import datetime
-sys.path.append("../lib")
+
+if os.getcwd().rsplit("\\",1)[1] == "video":
+	sys.path.append("../lib")
+else:
+	sys.path.append("./lib")
 import AVHandler as avh
+
 import pandas as pd
 
 
@@ -19,7 +24,7 @@ def video_download(loc,cat,start_idx,end_idx):
     # end_idx    | the ending index of the video to download
 
     for i in range(start_idx,end_idx):
-        command = 'cd %s;' % loc
+        command = 'cd %s&' % loc
         f_name = str(i)
         link = avh.m_link(cat.loc[i, 'link'])
         start_time = cat.loc[i, 'start_time']
@@ -41,7 +46,7 @@ def generate_frames(loc,start_idx,end_idx):
 
     avh.mkdir('frames')
     for i in range(start_idx, end_idx):
-        command = 'cd %s;' % loc
+        command = 'cd %s&' % loc
         f_name = str(i)
         command += 'ffmpeg -i %s.mp4 -y -f image2  -vframes 75 ../frames/%s-%%02d.jpg' % (f_name, f_name)
         os.system(command)
@@ -57,33 +62,39 @@ def download_video_frames(loc,cat,start_idx,end_idx,rm_video):
 
     avh.mkdir('frames')
     for i in range(start_idx, end_idx + 1):
-        command = 'cd %s;' % loc
+        command = 'cd %s&' % loc
         f_name = str(i)
         link = avh.m_link(cat.loc[i, 'link'])
         start_time = cat.loc[i, 'start_time']
         end_time = start_time + 3.0
         start_time = datetime.timedelta(seconds=start_time)
         end_time = datetime.timedelta(seconds=end_time)
-        command += 'ffmpeg -i $(youtube-dl -f ”mp4“ --get-url ' + link + ') ' + '-c:v h264 -c:a copy -ss %s -to %s %s.mp4;' \
-                   % (start_time, end_time, f_name)
+        # n = os.system('youtube-dl -f ”mp4“ --get-url ' + link + '&')
+        command += 'ffmpeg -i %s ' + '-c:v h264 -c:a copy -ss %s -to %s %s.mp4&' \
+                   % (n,start_time, end_time, f_name)
         #ommand += 'ffmpeg -i %s.mp4 -r 25 %s.mp4;' % (f_name, 'clip_' + f_name)  # convert fps to 25
         #command += 'rm %s.mp4;' % f_name
 
         #converts to frames
         #command += 'ffmpeg -i %s.mp4 -y -f image2  -vframes 75 ../frames/%s-%%02d.jpg;' % (f_name, f_name)
-        command += 'ffmpeg -i %s.mp4 -vf fps=25 ../frames/%s-%%02d.jpg;' % (f_name, f_name)
+        command += 'ffmpeg -i %s.mp4 -vf fps=25 ../frames/%s-%%02d.jpg&' % (f_name, f_name)
         #command += 'ffmpeg -i %s.mp4 ../frames/%sfr_%%02d.jpg;' % ('clip_' + f_name, f_name)
 
         if rm_video:
-            command += 'rm %s.mp4' % f_name
+            command += 'del %s.mp4' % f_name
+        print(command)
         os.system(command)
 
-avh.mkdir('video_train')
-cat_train = pd.read_csv('../audio/catalog/avspeech_train.csv')
+def download_video(loc='video_train',path='../audio/catalog/avspeech_train.csv',start_idx=0,end_idx=1,rm_video=True):
+    avh.mkdir('video_train')
+    cat_train = pd.read_csv(path)
 
-# download video , convert to images separately
-#avh.video_download(loc='video_train',v_name='video_train',cat=cat_train,start_idx=2,end_idx=4)
-#avh.generate_frames(loc='video_train',v_name='clip_video_train',start_idx=2,end_idx=4)
+    # download video , convert to images separately
+    #avh.video_download(loc='video_train',v_name='video_train',cat=cat_train,start_idx=2,end_idx=4)
+    #avh.generate_frames(loc='video_train',v_name='clip_video_train',start_idx=2,end_idx=4)
 
-# download each video and convert to frames immediately
-download_video_frames(loc='video_train',cat=cat_train,start_idx=1405,end_idx=2000,rm_video=True)
+    # download each video and convert to frames immediately
+    download_video_frames(loc=loc,cat=cat_train,start_idx=start_idx,end_idx=end_idx,rm_video=rm_video)
+
+if __name__ == '__main__':
+    download_video()

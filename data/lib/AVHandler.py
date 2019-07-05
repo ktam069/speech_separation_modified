@@ -49,7 +49,7 @@ def cut(loc,name,start_time,end_time):
     length = end_time - start_time
     command = 'cd %s&' % loc
     command += 'sox %s.wav trim_%s.wav trim %s %s&' % (name,name,start_time,length)
-    command += 'rm %s.wav' % name
+    command += 'del %s.wav' % name
     os.system(command)
 
 
