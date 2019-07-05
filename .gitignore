@@ -7,3 +7,5 @@ avspeech_train.csv
 
 # Ignore downloaded AVSpeech data also
 *.wav
+*.mp4
+*.jpg

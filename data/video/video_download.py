@@ -4,6 +4,7 @@ from __future__ import print_function
 import sys
 import os
 import datetime
+import subprocess
 
 if os.getcwd().rsplit("\\",1)[1] == "video":
 	sys.path.append("../lib")
@@ -69,8 +70,13 @@ def download_video_frames(loc,cat,start_idx,end_idx,rm_video):
         end_time = start_time + 3.0
         start_time = datetime.timedelta(seconds=start_time)
         end_time = datetime.timedelta(seconds=end_time)
-        # n = os.system('youtube-dl -f ”mp4“ --get-url ' + link + '&')
-        command += 'ffmpeg -i %s ' + '-c:v h264 -c:a copy -ss %s -to %s %s.mp4&' \
+        
+        # Run subprocess to get url
+        n = subprocess.check_output(['youtube-dl', '-f', '”mp4“', '--get-url', str(link)])
+        # Convert to string and remove whitespaces
+        n = str(n.decode("utf-8")).split()[0]
+        
+        command += 'ffmpeg -i "%s" -c:v h264 -c:a copy -ss %s -to %s %s.mp4&' \
                    % (n,start_time, end_time, f_name)
         #ommand += 'ffmpeg -i %s.mp4 -r 25 %s.mp4;' % (f_name, 'clip_' + f_name)  # convert fps to 25
         #command += 'rm %s.mp4;' % f_name

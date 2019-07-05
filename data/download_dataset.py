@@ -31,14 +31,14 @@ def main():
 	os.chdir("./audio")
 
 	# Download and trim audio wav files from youtube
-	# if dl_from_training:
-		# download_from_training()		
-	# else:
-		# download_from_testing()
+	if dl_from_training:
+		download_from_training()		
+	else:
+		download_from_testing()
 	
-	# # Normalises audio data
-	# if normalise_data:
-		# norm(start_id, end_id)
+	# Normalises audio data
+	if normalise_data:
+		norm(start_id, end_id)
 	
 	os.chdir("../video")
 	
