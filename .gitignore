@@ -9,3 +9,7 @@ avspeech_train.csv
 *.wav
 *.mp4
 *.jpg
+
+# Ignore output files and databases
+valid_frame.txt
+

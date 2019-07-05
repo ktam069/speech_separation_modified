@@ -1,22 +1,29 @@
 import sys
-sys.path.append("../../model/lib")
 import os
 import librosa
 import numpy as np
-import utils
 import itertools
 import time
 import random
 import math
 import scipy.io.wavfile as wavfile
 
+if os.getcwd().rsplit("\\",1)[1] == "audio":
+    sys.path.append("../../model/lib")
+else:
+    sys.path.append("./../model/lib")
+import utils
+
 # Parameter
 SAMPLE_RANGE = (0,20) # data usage to generate database
-WAV_REPO_PATH = os.path.expanduser("./norm_audio_train")
-DATABASE_REPO_PATH = 'AV_model_database'
-FRAME_LOG_PATH = '../video/valid_frame.txt'
 NUM_SPEAKER = 2
 MAX_NUM_SAMPLE = 50000
+
+DATABASE_REPO_PATH = 'AV_model_database'
+FRAME_LOG_PATH = '../video/valid_frame.txt'
+
+# WAV_REPO_PATH = os.path.expanduser("./norm_audio_train")
+WAV_REPO_PATH = "./norm_audio_train"
 
 # time measure decorator
 def timit(func):
@@ -234,7 +241,7 @@ def train_test_split(dataset_log_path,data_range=[0,50000],test_ratio=0.1,shuffl
             f.write(line)
             f.write('\n')
 
-if __name__ == "__main__":
+def build_database():
     init_dir()
     audio_path_list = generate_path_list()
     single_audio_to_npy(audio_path_list)
@@ -245,7 +252,10 @@ if __name__ == "__main__":
     all_crm(mix_log_path)
 
     dataset_log_path ='%s/dataset.txt'%DATABASE_REPO_PATH
-    train_test_split(dataset_log_path,data_range=[0,MAX_NUM_SAMPLE])
+    train_test_split(dataset_log_path,data_range=[0,MAX_NUM_SAMPLE])    
+
+if __name__ == "__main__":
+    build_database()
 
 
 

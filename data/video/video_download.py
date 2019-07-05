@@ -15,7 +15,6 @@ import AVHandler as avh
 import pandas as pd
 
 
-
 def video_download(loc,cat,start_idx,end_idx):
     # Only download the video from the link
     # loc        | the location for downloaded file
