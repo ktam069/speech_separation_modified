@@ -32,10 +32,10 @@ def download(loc,name,link,sr=16000,type='audio'):
 
     if type == 'audio':
         # download wav file from the youtube link
-        command = 'cd %s;' % loc
-        command += 'youtube-dl -x --audio-format wav -o o' + name + '.wav ' + link + ';'
-        command += 'ffmpeg -i o%s.wav -ar %d -ac 1 %s.wav;' % (name,sr,name)
-        command += 'rm o%s.wav' % name
+        command = 'cd %s&' % loc
+        command += 'youtube-dl -x --audio-format wav -o o' + name + '.wav ' + link + '&'
+        command += 'ffmpeg -i o%s.wav -ar %d -ac 1 %s.wav&' % (name,sr,name)
+        command += 'del o%s.wav' % name
         os.system(command)
 
 
@@ -47,18 +47,18 @@ def cut(loc,name,start_time,end_time):
     # start_time  | the start time of the audio segment
     # end_time    | the end time of the audio segment
     length = end_time - start_time
-    command = 'cd %s;' % loc
-    command += 'sox %s.wav trim_%s.wav trim %s %s;' % (name,name,start_time,length)
+    command = 'cd %s&' % loc
+    command += 'sox %s.wav trim_%s.wav trim %s %s&' % (name,name,start_time,length)
     command += 'rm %s.wav' % name
     os.system(command)
 
 
 def conc(loc,name,trim_clean=False):
     # concatenate the data in the loc (trim*.wav)
-    command = 'cd %s;' % loc
-    command += 'sox --combine concatenate trim_*.wav -o %s.wav;' % name
+    command = 'cd %s&' % loc
+    command += 'sox --combine concatenate trim_*.wav -o %s.wav&' % name
     if trim_clean:
-    	command += 'rm trim_*.wav;'
+    	command += 'rm trim_*.wav&'
     os.system(command)
 
 
@@ -90,7 +90,7 @@ def mix(loc,name,file1,file2,start,end,trim_clean=False):
     path = '%s/%s.wav' % (loc,name)
     wavfile.write(path,wav1_sr,mix_wav)
     if trim_clean:
-        command += 'rm trim_%s.wav;rm trim_%s.wav;' % (file1,file2)
+        command += 'rm trim_%s.wav&rm trim_%s.wav&' % (file1,file2)
     os.system(command)
 
 
