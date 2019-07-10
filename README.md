@@ -1,6 +1,12 @@
 # Modified for Part IV - speech_separation
 (Original: https://github.com/bill9800/speech_separation)
 
+Steps 2-5* for data downloading can be run by calling:
+```
+python download_dataset.py
+```
+from within that data folder.
+
 # Overview
 
 This is a project to improve the speech separation task. In this project, Audio-only and Audio-Visual deep learning separation models are modified based on the paper [Lookng to Listen at the Cocktail Party](https://arxiv.org/abs/1804.03619)[1]. 
