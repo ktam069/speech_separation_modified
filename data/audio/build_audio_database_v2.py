@@ -15,7 +15,7 @@ else:
 import utils
 
 # Parameter
-SAMPLE_RANGE = (0,2) # data usage to generate database
+SAMPLE_RANGE = (0,10) # data usage to generate database
 NUM_SPEAKER = 2
 MAX_NUM_SAMPLE = 50000
 
@@ -111,6 +111,12 @@ def split_to_mix(audio_path_list,database_repo=DATABASE_REPO_PATH,partition=2):
                 f.write('\n')
         head += part_len
         part_idx += 1
+
+        # Note: prevent the program from running indefinitely - should refine condition
+        if part_idx > 99:
+            print("\n\n == Error: split_to_mix failed... == \n\n")
+            break
+
     return split_list
 
 # mix single TF data

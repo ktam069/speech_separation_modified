@@ -21,6 +21,7 @@ end_id = 21
 
 # Whether to download from the training set or the test set
 dl_from_training = True
+
 normalise_data = True
 
 # ====================
@@ -55,6 +56,9 @@ def process_video():
 	print("\n\n ===== Completed processing video ===== \n")
 
 def build_AV_databases():
+	# TODO: Not sure what the exact condition is, but can fail without enough data
+	assert end_id-start_id > 5, "Too few samples to generate database (probably...)"
+	
 	build_database(sample_range=(start_id,end_id))
 	
 	print("\n\n ===== Completed building databases ===== \n")
@@ -69,8 +73,8 @@ def main():
 	process_video()
 	
 	# Generate database from audio and visual data
-	# os.chdir("../audio")
-	# build_AV_databases()
+	os.chdir("../audio")
+	build_AV_databases()
 
 if __name__ == '__main__':
 	main()
