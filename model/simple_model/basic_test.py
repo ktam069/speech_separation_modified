@@ -61,6 +61,11 @@ if MODEL_CHECK1:
     filepath = "model-{epoch:02d}-{val_loss:.4f}.h5"
     checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     model = model_AO.AO_model(2)
+
+    # Note: added compile to bypass error
+    adam = optimizers.Adam()
+    model.compile(optimizer=adam, loss='mse')
+    
     model.fit(FM, cRM,
                  epochs=5,
                  batch_size=2,
@@ -73,7 +78,7 @@ if MODEL_CHECK1:
 if MODEL_CHECK2:
     # check data generative function
     people_num = 2
-    sample_range = (0,20)
+    sample_range = (0,2)
 
     repo_path = os.path.expanduser('../../data/audio/audio_train')
     X_data,y_data = avp.generate_dataset(sample_range,repo_path,num_speaker=2,verbose=1)
@@ -106,15 +111,29 @@ if MODEL_CHECK2:
         AO_model = load_model('./saved_models_AO/***.h5')
     else:
         AO_model = model_AO.AO_model(people_num)
+        
+        # Note: added compile to bypass error
+        adam = optimizers.Adam()
+        AO_model.compile(optimizer=adam, loss='mse')
+        
+        # AO_model.fit(X_train, y_train,
+                     # epochs=200,
+                     # batch_size=4,
+                     # validation_data=(X_val, y_val),
+                     # shuffle=False,
+                     # callbacks=[TensorBoard(log_dir='./log_AO'), checkpoint],
+                     # initial_epoch=0)
+
+        # Note: temp - changed to smaller sizes for testing purposes
         AO_model.fit(X_train, y_train,
-                     epochs=200,
-                     batch_size=4,
+                     epochs=5,
+                     batch_size=2,
                      validation_data=(X_val, y_val),
                      shuffle=False,
                      callbacks=[TensorBoard(log_dir='./log_AO'), checkpoint],
                      initial_epoch=0)
-
-    #pred_cRM = model.predict(X_data)
+		
+    pred_cRM = model.predict(X_data)
 
 
 

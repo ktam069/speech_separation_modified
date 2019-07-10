@@ -16,8 +16,8 @@ from build_audio_database_v2 import build_database
 # ===== Settings =====
 
 # Range of data to download from AVSpeech (excludes end_id(?))
-start_id = 2
-end_id = 3
+start_id = 0
+end_id = 21
 
 # Whether to download from the training set or the test set
 dl_from_training = True
@@ -32,9 +32,9 @@ test_data_max_len = 183273
 def process_audio():
 	# Download and trim audio wav files from youtube
 	if dl_from_training:
-		download_from_training()		
+		download_from_training(start_id, end_id)		
 	else:
-		download_from_testing()
+		download_from_testing(start_id, end_id)
 	
 	# Normalises audio data
 	if normalise_data:
@@ -55,7 +55,7 @@ def process_video():
 	print("\n\n ===== Completed processing video ===== \n")
 
 def build_AV_databases():
-	build_database()
+	build_database(sample_range=(start_id,end_id))
 	
 	print("\n\n ===== Completed building databases ===== \n")
 
@@ -69,7 +69,7 @@ def main():
 	process_video()
 	
 	# Generate database from audio and visual data
-	os.chdir("../audio")
+	# os.chdir("../audio")
 	# build_AV_databases()
 
 if __name__ == '__main__':

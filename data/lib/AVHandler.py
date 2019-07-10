@@ -58,7 +58,7 @@ def conc(loc,name,trim_clean=False):
     command = 'cd %s&' % loc
     command += 'sox --combine concatenate trim_*.wav -o %s.wav&' % name
     if trim_clean:
-    	command += 'rm trim_*.wav&'
+    	command += 'del trim_*.wav&'
     os.system(command)
 
 
@@ -71,7 +71,7 @@ def mix(loc,name,file1,file2,start,end,trim_clean=False):
     # start       | mixture starting time
     # end         | mixture end time
     # trim_clean  | delete the trim file or not
-    command = 'cd %s;' % loc
+    command = 'cd %s&' % loc
     cut(loc,file1,start,end)
     cut(loc,file2,start,end)
     trim1 = '%s/trim_%s.wav' % (loc,file1)
@@ -90,7 +90,7 @@ def mix(loc,name,file1,file2,start,end,trim_clean=False):
     path = '%s/%s.wav' % (loc,name)
     wavfile.write(path,wav1_sr,mix_wav)
     if trim_clean:
-        command += 'rm trim_%s.wav&rm trim_%s.wav&' % (file1,file2)
+        command += 'del trim_%s.wav&del trim_%s.wav&' % (file1,file2)
     os.system(command)
 
 

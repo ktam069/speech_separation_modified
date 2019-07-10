@@ -7,14 +7,19 @@ import os
 import scipy.io.wavfile as wavfile
 # OPTION
 TRAIN = 0
-TEST = 0
+TEST = 1
 INVERSE_CHECK = 1
 
 
 # read the data in time domain and its sample rate
-path1 = '../../data/audio/audio/trim_audio1.wav'
-path2 = '../../data/audio/audio/trim_audio2.wav'
-path3 = '../../data/audio/audio/mix_audio.wav'
+# path1 = '../../data/audio/audio/trim_audio1.wav'
+# path2 = '../../data/audio/audio/trim_audio2.wav'
+# path3 = '../../data/audio/audio/mix_audio.wav'
+
+path1 = '../../data/simple_audio/simple_audio/trim_simple_audio1_1.wav'
+path2 = '../../data/simple_audio/simple_audio/trim_simple_audio1_2.wav'
+path3 = '../../data/simple_audio/simple_audio/simple_audio1.wav'
+
 with open(path1, 'rb') as f:
     data1, sr1 = librosa.load(path1, sr=None)
 
@@ -175,7 +180,8 @@ if TRAIN:
     opt = optimizers.Adam(lr=3*1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-7, decay=0.0001, amsgrad=False)
     model.compile(loss='mse', optimizer=opt)
 
-    plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
+	# TODO: install pydot and other dependencies to run this
+    # plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
     model.summary()
 
     tensorboard = TensorBoard(log_dir="./logs", histogram_freq=0, write_graph=True, write_images=True)
@@ -205,7 +211,8 @@ if TEST:
     model.load_weights("save/model1.h5")
     print("Loaded model from disk")
 
-    path = '../../data/audio/audio/mix_audio.wav'
+    # path = '../../data/audio/audio/mix_audio.wav'
+    path = path3
 
     with open(path, 'rb') as f:
         test_data, test_sr = librosa.load(path, sr=None)
@@ -241,7 +248,8 @@ if TEST:
 
 
 if INVERSE_CHECK:
-    path = '../../data/audio/audio_train/mix_audio.wav'
+    # path = '../../data/audio/audio_train/mix_audio.wav'
+    path = path3
     with open(path, 'rb') as f:
         test_data, test_sr = librosa.load(path, sr=None)
     F = window_fft(test_data, fft_size, step_size)

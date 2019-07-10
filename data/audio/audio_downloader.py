@@ -49,7 +49,7 @@ def m_audio(loc,name,cat,start_idx,end_idx):
 		avh.download(loc,f_name,link)
 		avh.cut(loc,f_name,start_time,end_time)
 
-def download_from_training():
+def download_from_training(start_id=start_id, end_id=end_id):
 	assert start_id >= 0 and end_id < train_data_max_len, "Data ID range is invalid"
 	
 	cat_train = pd.read_csv('catalog/avspeech_train.csv')
@@ -58,7 +58,7 @@ def download_from_training():
 	avh.mkdir('audio_train')
 	m_audio('audio_train', 'audio_train', cat_train, start_id, end_id)
 	
-def download_from_testing():
+def download_from_testing(start_id=start_id, end_id=end_id):
 	assert start_id >= 0 and end_id < test_data_max_len, "Data ID range is invalid"
 	
 	cat_test = pd.read_csv('catalog/avspeech_test.csv')

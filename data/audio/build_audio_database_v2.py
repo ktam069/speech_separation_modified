@@ -15,7 +15,7 @@ else:
 import utils
 
 # Parameter
-SAMPLE_RANGE = (0,20) # data usage to generate database
+SAMPLE_RANGE = (0,2) # data usage to generate database
 NUM_SPEAKER = 2
 MAX_NUM_SAMPLE = 50000
 
@@ -241,9 +241,9 @@ def train_test_split(dataset_log_path,data_range=[0,50000],test_ratio=0.1,shuffl
             f.write(line)
             f.write('\n')
 
-def build_database():
+def build_database(sample_range=SAMPLE_RANGE):
     init_dir()
-    audio_path_list = generate_path_list()
+    audio_path_list = generate_path_list(sample_range=SAMPLE_RANGE)
     single_audio_to_npy(audio_path_list)
     split_list = split_to_mix(audio_path_list,partition=NUM_SPEAKER)
     all_mix(split_list,partition=NUM_SPEAKER)
