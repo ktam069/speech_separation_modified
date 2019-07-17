@@ -13,3 +13,4 @@ avspeech_train.csv
 # Ignore output files and databases
 valid_frame.txt
 *.h5
+*.npy

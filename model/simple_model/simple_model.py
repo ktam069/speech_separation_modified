@@ -180,7 +180,7 @@ if TRAIN:
     opt = optimizers.Adam(lr=3*1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-7, decay=0.0001, amsgrad=False)
     model.compile(loss='mse', optimizer=opt)
 
-	# TODO: install pydot and other dependencies to run this
+    # TODO: install pydot and other dependencies to run this
     # plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=True)
     model.summary()
 
