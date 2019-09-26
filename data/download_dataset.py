@@ -5,6 +5,7 @@ import sys
 
 sys.path.append("./audio")
 sys.path.append("./video")
+sys.path.append("./AV_log")
 
 from audio_downloader import download_from_training, download_from_testing
 from audio_norm import norm
@@ -12,12 +13,13 @@ from video_download import download_video
 from MTCNN_detect import mtcnn_detect
 from frame_inspector import frame_inspect
 from build_audio_database_v2 import build_database
+from gentxtnew import main as gentxtnew
 
 # ===== Settings =====
 
 # Range of data to download from AVSpeech (excludes end_id(?))
-start_id = 0
-end_id = 21
+start_id = 21
+end_id = 101
 
 # Whether to download from the training set or the test set
 dl_from_training = True
@@ -45,7 +47,10 @@ def process_audio():
 
 def process_video():
 	# Download video data from online
-	download_video(start_idx=start_id, end_idx=end_id)
+	try:
+		download_video(start_idx=start_id, end_idx=end_id)
+	except subprocess.CalledProcessError as e:
+		print("Download failed -", e)
 	
 	# Crop frames to fit face
 	mtcnn_detect(detect_range=(start_id,end_id))
@@ -66,15 +71,22 @@ def build_AV_databases():
 def main():
 	# Download and process audio data from links
 	os.chdir("./audio")
-	process_audio()
+	# process_audio()
 	
 	# Download and process video data from links
 	os.chdir("../video")
-	process_video()
+	# process_video()
 	
 	# Generate database from audio and visual data
 	os.chdir("../audio")
-	build_AV_databases()
+	# build_AV_databases()
+	
+	os.chdir("../AV_log")
+	gentxtnew()
+	
+	# Then:
+	# Run model/pretrain_model/pretrain_load_test.py
+	# Rename face1022_emb to face_emb, and copy folder to data/video
 
 if __name__ == '__main__':
 	main()

@@ -249,7 +249,7 @@ def train_test_split(dataset_log_path,data_range=[0,50000],test_ratio=0.1,shuffl
 
 def build_database(sample_range=SAMPLE_RANGE):
     init_dir()
-    audio_path_list = generate_path_list(sample_range=SAMPLE_RANGE)
+    audio_path_list = generate_path_list(sample_range)
     single_audio_to_npy(audio_path_list)
     split_list = split_to_mix(audio_path_list,partition=NUM_SPEAKER)
     all_mix(split_list,partition=NUM_SPEAKER)

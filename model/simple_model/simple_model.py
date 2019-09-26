@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 import os
 import scipy.io.wavfile as wavfile
 # OPTION
-TRAIN = 0
-TEST = 1
-INVERSE_CHECK = 1
+TRAIN = 1
+TEST = 0
+INVERSE_CHECK = 0
 
 
 # read the data in time domain and its sample rate
@@ -156,6 +156,7 @@ if TRAIN:
     n_hidden2 = 500
     n_hidden3 = 180
 
+    print ((n_input_dim,))
     InputLayer1 = Input(shape=(n_input_dim,), name="InputLayer")
     InputLayer2 = BatchNormalization(momentum=0.6)(InputLayer1)
 
@@ -187,21 +188,21 @@ if TRAIN:
     tensorboard = TensorBoard(log_dir="./logs", histogram_freq=0, write_graph=True, write_images=True)
 
     # train the model
-    hist = model.fit(X_train, y_train, batch_size=128, epochs=100, verbose=1, validation_data=([X_val], [y_val]),
-                     callbacks=[tensorboard])
+    # hist = model.fit(X_train, y_train, batch_size=128, epochs=100, verbose=1, validation_data=([X_val], [y_val]),
+                     # callbacks=[tensorboard])
 
-    results = model.evaluate(X_test, y_test, batch_size=len(y_test))
-    print('Test loss:%3f' % results)
+    # results = model.evaluate(X_test, y_test, batch_size=len(y_test))
+    # print('Test loss:%3f' % results)
 
     # serialize model to JSON
 
-    os.system('mkdir save')
-    model_json = model.to_json()
-    with open("save/model1.json", 'w') as f:
-        f.write(model_json)
+    # os.system('mkdir save')
+    # model_json = model.to_json()
+    # with open("save/model1.json", 'w') as f:
+        # f.write(model_json)
     # serialize weights to HDF5
-    model.save_weights("save/model1.h5")
-    print("Saved model to disk")
+    # model.save_weights("save/model1.h5")
+    # print("Saved model to disk")
 
 if TEST:
     # load json and create model

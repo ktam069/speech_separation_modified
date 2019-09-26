@@ -1,15 +1,17 @@
-from keras import optimizers
-#from keras.layers import Dense, Convolution3D, MaxPooling3D, ZeroPadding3D, Dropout, Flatten, BatchNormalization, ReLU
-from keras.models import Sequential, model_from_json
-from keras import optimizers
-from keras.layers import Input, Dense, Convolution2D, Deconvolution2D, Bidirectional, UpSampling2D, UpSampling3D, concatenate
-from keras.layers import Dropout, Flatten, BatchNormalization, ReLU, Reshape, Permute, Lambda, TimeDistributed
-from keras.models import Model, load_model
-from keras.layers.recurrent import LSTM
-from keras.initializers import he_normal, glorot_uniform
+from tensorflow.keras import optimizers
+# from tensorflow.keras.layers import Dense, Convolution3D, MaxPooling3D, ZeroPadding3D, Dropout, Flatten, BatchNormalization, ReLU
+from tensorflow.keras.models import Sequential, model_from_json
+from tensorflow.keras import optimizers
+from tensorflow.keras.layers import Input, Dense, Convolution2D, Bidirectional, UpSampling2D, UpSampling3D, concatenate
+from tensorflow.keras.layers import Dropout, Flatten, BatchNormalization, ReLU, Reshape, Permute, Lambda, TimeDistributed
+from tensorflow.keras.models import Model, load_model
+# from keras.layers.recurrent import LSTM
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.initializers import he_normal, glorot_uniform
+# from keras.layers import Deconvolution2D
 import numpy as np
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from tensorflow.keras.callbacks import TensorBoard
 import tensorflow as tf
 import os
 from MyGenerator import AVGenerator

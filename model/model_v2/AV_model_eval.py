@@ -1,7 +1,7 @@
 ## evaluate the model and generate the prediction
 import sys
 sys.path.append('../lib')
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 from model_ops import ModelMGPU
 import os
 import scipy.io.wavfile as wavfile
@@ -15,8 +15,8 @@ NUM_GPU = 1
 # PATH
 # model_path = './saved_models_AO_with_norm/AOmodel-2p-015-0.02258.h5'
 # model_path = './saved_AV_models/AVmodel-2p-092-0.70643.h5'	# trained on 21 data points
-# model_path = './AVmodel-2p-002-0.87080.h5'	# 234K
-model_path = './AVmodel-2p-006-0.75753.h5'	# 50K
+model_path = './AVmodel-2p-002-0.87080.h5'	# 234K
+# model_path = './AVmodel-2p-006-0.75753.h5'	# 50K
 dir_path = './pred/'
 if not os.path.isdir(dir_path):
 	os.mkdir(dir_path)
@@ -94,19 +94,24 @@ if NUM_GPU <= 1:
 		print("time elapsed since start:", t)
 		
 		mix, single_idxs, face_embs = parse_X_data(line)
-		mix_expand = np.expand_dims(mix, axis=0)
-		cRMs = AV_model.predict([mix_expand, face_embs])
-		cRMs = cRMs[0]
+		# mix_expand = np.expand_dims(mix, axis=0)
+		# cRMs = AV_model.predict([mix_expand, face_embs])
+		# cRMs = cRMs[0]
 		prefix = ""
 		for idx in single_idxs:
 			prefix += idx + "-"
-		for i in range(people_num):
-			cRM = cRMs[:,:,:,i]
-			assert cRM.shape == (298,257,2)
-			F = utils.fast_icRM(mix,cRM)
-			T = utils.fast_istft(F,power=False)
-			filename = dir_path+prefix+single_idxs[i]+'.wav'
-			wavfile.write(filename,16000,T)
+		
+		np.save("./test_inputs/mix_%s.npy"%prefix, mix)
+		# np.save("./test_inputs/mix_expand_%s.npy"%prefix, mix_expand)
+		# np.save("./test_inputs/face_embs_%s.npy"%prefix, face_embs)
+		
+		# for i in range(people_num):
+			# cRM = cRMs[:,:,:,i]
+			# assert cRM.shape == (298,257,2)
+			# F = utils.fast_icRM(mix,cRM)
+			# T = utils.fast_istft(F,power=False)
+			# filename = dir_path+prefix+single_idxs[i]+'.wav'
+			# wavfile.write(filename,16000,T)
 
 
 
