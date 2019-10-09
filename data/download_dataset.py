@@ -18,7 +18,7 @@ from gentxtnew import main as gentxtnew
 # ===== Settings =====
 
 # Range of data to download from AVSpeech (excludes end_id(?))
-start_id = 21
+start_id = 0
 end_id = 101
 
 # Whether to download from the training set or the test set
@@ -82,7 +82,7 @@ def main():
 	# build_AV_databases()
 	
 	os.chdir("../AV_log")
-	gentxtnew()
+	# gentxtnew()
 	
 	# Then:
 	# Run model/pretrain_model/pretrain_load_test.py

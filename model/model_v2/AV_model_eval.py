@@ -23,6 +23,7 @@ if not os.path.isdir(dir_path):
 
 # database_path = '../../data/audio/audio_database/mix/'
 database_path = '../../data/audio/AV_model_database/mix/'
+database_crm_path = '../../data/audio/AV_model_database/crm/'
 face_path = '../../data/video/face_emb/'
 
 
@@ -68,6 +69,7 @@ start_time = time.time()
 
 # predict data
 AV_model = load_model(model_path,custom_objects={"tf": tf, 'loss_func': loss_func})
+
 if NUM_GPU > 1:
 	parallel_model = ModelMGPU(AV_model,NUM_GPU)
 	for line in testfiles:
@@ -86,6 +88,7 @@ if NUM_GPU > 1:
 			filename = dir_path+prefix+str(single_idxs[i])+'.wav'
 			wavfile.write(filename,16000,T)
 
+number_tested = 0
 
 if NUM_GPU <= 1:
 	for line in testfiles:
@@ -94,24 +97,48 @@ if NUM_GPU <= 1:
 		print("time elapsed since start:", t)
 		
 		mix, single_idxs, face_embs = parse_X_data(line)
-		# mix_expand = np.expand_dims(mix, axis=0)
-		# cRMs = AV_model.predict([mix_expand, face_embs])
-		# cRMs = cRMs[0]
+		mix_expand = np.expand_dims(mix, axis=0)
+		cRMs = AV_model.predict([mix_expand, face_embs])
+		cRMs = cRMs[0]
 		prefix = ""
 		for idx in single_idxs:
 			prefix += idx + "-"
 		
-		np.save("./test_inputs/mix_%s.npy"%prefix, mix)
+		# np.save("./test_inputs/mix_%s.npy"%prefix, mix)
 		# np.save("./test_inputs/mix_expand_%s.npy"%prefix, mix_expand)
 		# np.save("./test_inputs/face_embs_%s.npy"%prefix, face_embs)
 		
-		# for i in range(people_num):
-			# cRM = cRMs[:,:,:,i]
-			# assert cRM.shape == (298,257,2)
-			# F = utils.fast_icRM(mix,cRM)
-			# T = utils.fast_istft(F,power=False)
-			# filename = dir_path+prefix+single_idxs[i]+'.wav'
-			# wavfile.write(filename,16000,T)
+		for i in range(people_num):
+			cRM = cRMs[:,:,:,i]
+			assert cRM.shape == (298,257,2)
+			F = utils.fast_icRM(mix,cRM)
+			T = utils.fast_istft(F,power=False)
+			filename = dir_path+prefix+single_idxs[i]+'.wav'
+			wavfile.write(filename,16000,T)
+		
+		
+		'''Evaluating model for accuracy info'''
+			
+		if number_tested == 0:
+			from model_loss import audio_discriminate_loss2 as audio_loss
+			from tensorflow.keras import optimizers
+			gamma_loss = 0.1
+			beta_loss = gamma_loss*2
+			adam = optimizers.Adam()
+			loss = audio_loss(gamma=gamma_loss,beta=beta_loss, num_speaker=people_num)
+			AV_model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
+		
+		actual_crm = np.zeros((1,298,257,2,people_num))
+		for i in range(people_num):
+			fn = database_crm_path + 'crm-' + prefix + single_idxs[i] + ".npy"
+			actual_crm[:,:,:,:,i] = np.load(fn)
+			print(fn)
+		
+		scores = AV_model.evaluate([mix_expand, face_embs], actual_crm)
+		
+		
+		number_tested += 1
+		if number_tested > 3: break
 
 
 

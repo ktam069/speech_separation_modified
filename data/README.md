@@ -1,9 +1,9 @@
 # Changes
-Steps 2-5* can be run by calling:
+Steps 2-7* can be run by calling:
 ```
 python download_dataset.py
 ```
-*Step 6 is currently commented out - not sure how it works.
+*Step 8 currently has to be done manually.
 
 # Instruction for generating data
 

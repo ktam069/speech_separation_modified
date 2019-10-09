@@ -8,6 +8,11 @@ import AVHandler as avh
 
 import pandas as pd
 
+
+'''Video to download'''
+video_id = 6
+
+
 def download_video_frames(video_length=3.0):
 	# loc		| the location for downloaded file
 	
@@ -17,7 +22,6 @@ def download_video_frames(video_length=3.0):
 	cat = pd.read_csv(path)
 
 	avh.mkdir('frames')
-	video_id = 1
 	i = video_id
 	
 	try:

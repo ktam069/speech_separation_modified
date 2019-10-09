@@ -1,7 +1,7 @@
 # Modified for Part IV - speech_separation
 (Original: https://github.com/bill9800/speech_separation)
 
-Steps 2-5* for data downloading can be run by calling:
+Steps 2-7* for data downloading can be run by calling:
 ```
 python download_dataset.py
 ```

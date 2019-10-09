@@ -20,6 +20,10 @@ from keras.models import Model
 
 from mtcnn.mtcnn import MTCNN
 import cv2
+import matplotlib.pyplot as plt		# used for testing (visualising) purposes only
+
+from keras.models import load_model as load_model_facenet
+import matplotlib.image as mpimg
 
 '''Note that the code from the utils script is needed (found under model/lib/)'''
 import utils
@@ -45,23 +49,22 @@ dir_path_face_embs = './face_emb/'
 '''
 
 def main(video_name=VIDEO_NAME):
-	# init(video_name)
-	# # video_name = video_name.rsplit(".mp4")[0]
+	init(video_name)
 	
-	# '''Generate a wav file for the audio stream'''
-	# mp4_to_wav(video_name, sr=16000)
+	'''Generate a wav file for the audio stream'''
+	mp4_to_wav(video_name, sr=16000)
 	
-	# '''Generate face frames for the video stream'''
-	# generate_frames(video_name, fps=25)
-	# mtcnn_detect(video_name, video_length=3, fps=25)
-	# frame_inspect(video_name, video_length=3, fps=25)
-	# # TODO: use audio only model if no face is detected?
+	'''Generate face frames for the video stream'''
+	generate_frames(video_name, fps=25)
+	mtcnn_detect(video_name, video_length=3, fps=25)
+	frame_inspect(video_name, video_length=3, fps=25)
+	# TODO: use audio only model if no face is detected?
 	
-	# '''Preprocess audio data'''
-	# preprocess_audio(video_name, sr=16000)
+	'''Preprocess audio data'''
+	preprocess_audio(video_name, sr=16000)
 	
-	# '''Preprocess video data - FaceNet'''
-	# facenet_detect(video_name)
+	'''Preprocess video data - FaceNet'''
+	facenet_detect(video_name)
 	
 	'''Run prediction with AV model'''
 	run_predict(video_name)
@@ -151,61 +154,29 @@ def generate_frames(video_name=VIDEO_NAME, fps=25):
 # ==========================================================
 '''
 
-output_dir = './face_input'
-detect_range = (0,2)
-
-def bounding_box_check(faces,x,y):
-	# check the center
-	for face in faces:
-		bounding_box = face['box']
-		if(bounding_box[1]<0):
-			bounding_box[1] = 0
-		if(bounding_box[0]<0):
-			bounding_box[0] = 0
-		if(bounding_box[0]-50>x or bounding_box[0]+bounding_box[2]+50<x):
-			print('change person from')
-			print(bounding_box)
-			print('to')
-			continue
-		if (bounding_box[1]-50 > y or bounding_box[1] + bounding_box[3]+50 < y):
-			print('change person from')
-			print(bounding_box)
-			print('to')
-			continue
-		return bounding_box
-
 def face_detect(file,detector):
 	name = file.replace('.jpg', '').split('-')
 	
-	# cat = pd.read_csv('../audio/catalog/avspeech_train.csv')
-	# log = cat_train.iloc[int(name[0])]
-	# x = log['pos_x']
-	# y = log['pos_y']
-
-	'''TODO: detect location'''
-	
-	x,y = 0.586719, 0.311111
-	
 	img = cv2.imread('%s%s'%(dir_path_frames,file))
-	x = img.shape[1] * x
-	y = img.shape[0] * y
 	faces = detector.detect_faces(img)
-	# check if detected faces
-	if(len(faces)==0):
-		print('no face detect: '+file)
-		return #no face
-	bounding_box = bounding_box_check(faces,x,y)
-	if(bounding_box == None):
-		print('face is not related to given coord: '+file)
-		return
-	print(file," ",bounding_box)
-	print(file," ",x, y)
-	crop_img = img[bounding_box[1]:bounding_box[1] + bounding_box[3],bounding_box[0]:bounding_box[0]+bounding_box[2]]
-	crop_img = cv2.resize(crop_img,(160,160))
-	cv2.imwrite('%s/frame_'%output_dir + name[0] + '_' + name[1] + '.jpg', crop_img)
-	#crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
-	#plt.imshow(crop_img)
-	#plt.show()
+	
+	for i in range(num_people):
+		# check if detected faces
+		if(len(faces)<=i or faces[i]['confidence']<0.5):
+			print('Could not detect face for speaker no. %d: %s'%(i+1,file))
+			return
+		bounding_box = faces[i]['box']
+		bounding_box[1] = max(0, bounding_box[1])
+		bounding_box[0] = max(0, bounding_box[0])
+		print(file," ",bounding_box)
+		
+		crop_img = img[bounding_box[1]:bounding_box[1] + bounding_box[3],bounding_box[0]:bounding_box[0]+bounding_box[2]]
+		crop_img = cv2.resize(crop_img,(160,160))
+		cv2.imwrite('%s/frame_'%dir_path_faces + name[0] + '_p%d_'%i + name[1] + '.jpg', crop_img)
+		# crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
+		# plt.imshow(crop_img)
+		# plt.show()
+
 
 def mtcnn_detect(video_name, video_length=3, fps=25):
 	detector = MTCNN()
@@ -231,68 +202,65 @@ def check_frame(name,part,dir=dir_path_faces):
 def frame_inspect(video_name=VIDEO_NAME, video_length=3, fps=25):
 	i = video_name
 	valid = True
-	print('processing frame %s'%i)
+	print('processing frames for video %s'%i)
 	for j in range(1,video_length*fps+1):
 		if(check_frame(i,j)==False):
-			# path = inspect_dir + "/frame_%d_*.jpg"% i
-			# for file in glob.glob(path):
-				# os.remove(file)
 			valid = False
-			print('frame %s is not valid'%i)
+			print('At least one frame for video %s is not valid'%i)
 			break
 	return valid
 
 '''
 # ==========================================================
-# Use FaceNet to detect face (?)
+# Use FaceNet to generate face embeddings
 # ==========================================================
 '''
 
 # TODO: Not yet adapted to work with varying length videos
 
 def facenet_detect(video_name=VIDEO_NAME):
-	from keras.models import load_model
-	import matplotlib.image as mpimg
-	
 	FACE_INPUT_PATH = dir_path_faces
 	
 	print("Running FaceNet...")
 	print("Using frames from:", FACE_INPUT_PATH)
 
-	model = load_model(MODEL_PATH_FACENET)
+	model = load_model_facenet(MODEL_PATH_FACENET)
 	model.summary()
 	avgPool_layer_model = Model(inputs=model.input,outputs=model.get_layer('AvgPool').output)
 	# print(avgPool_layer_model.predict(data))
 
-	
-	line = "frame_"+video_name
-	
-	embtmp = np.zeros((75, 1, 1792))
-	headname = line.strip()
-	tailname = ''
-	for i in range(1, 76):
-		if i < 10:
-			tailname = '_0{}.jpg'.format(i)
-		else:
-			tailname = '_' + str(i) + '.jpg'
-		picname = headname + tailname
-		# print(picname)
-		I = mpimg.imread(FACE_INPUT_PATH + picname)
-		I_np = np.array(I)
-		I_np = I_np[np.newaxis, :, :, :]
-		# print(I_np.shape)
-		# print(avgPool_layer_model.predict(I_np).shape)
-		embtmp[i - 1, :] = avgPool_layer_model.predict(I_np)
+	for i in range(num_people):
+		try:
+			line = "frame_"+video_name+'_p%d'%i
+			
+			embtmp = np.zeros((75, 1, 1792))
+			headname = line.strip()
+			tailname = ''
+			for i in range(1, 76):
+				if i < 10:
+					tailname = '_0{}.jpg'.format(i)
+				else:
+					tailname = '_' + str(i) + '.jpg'
+				picname = headname + tailname
+				# print(picname)
+				I = mpimg.imread(FACE_INPUT_PATH + picname)
+				I_np = np.array(I)
+				I_np = I_np[np.newaxis, :, :, :]
+				# print(I_np.shape)
+				# print(avgPool_layer_model.predict(I_np).shape)
+				embtmp[i - 1, :] = avgPool_layer_model.predict(I_np)
 
-	# print(embtmp.shape)
-	# people_index = int(line.strip().split('_')[1])
-	# npname = '{:05d}_face_emb.npy'.format(people_index)
-	npname = '%s_face_emb.npy'%video_name
-	print(npname)
+			# print(embtmp.shape)
+			# people_index = int(line.strip().split('_')[1])
+			# npname = '{:05d}_face_emb.npy'.format(people_index)
+			npname = '%s_face_emb_p%d.npy'%(video_name,i)
+			print(npname)
 
-	np.save(dir_path_face_embs + npname, embtmp)
-	with open('faceemb_dataset.txt', 'a') as d:
-		d.write(npname + '\n')
+			np.save(dir_path_face_embs + npname, embtmp)
+			with open('faceemb_dataset.txt', 'a') as d:
+				d.write(npname + '\n')
+		except Exception as e:
+			print('No face input for speaker', i, e)
 	
 	print("Finished running FaceNet...")
 
@@ -368,9 +336,12 @@ def run_predict(video_name=VIDEO_NAME):
 	face_embs = np.zeros((1,75,1,1792,num_people))
 	print(face_embs.shape)
 	for i in range(num_people):
-		# face_embs[1,:,:,:,i] = np.load(dir_path_face_embs+"%s_face_emb.npy"%single_idxs[i])
-		'''Currently does not use the correct face input for both speakers (uses the same images for both right now)'''
-		face_embs[0,:,:,:,i] = np.load(dir_path_face_embs+"%s_face_emb.npy"%video_name)
+		try:
+			# face_embs[1,:,:,:,i] = np.load(dir_path_face_embs+"%s_face_emb.npy"%single_idxs[i])
+			'''Currently does not use the correct face input for both speakers (uses the same images for both right now)'''
+			face_embs[0,:,:,:,i] = np.load(dir_path_face_embs+"%s_face_emb_p%d.npy"%(video_name,i))
+		except Exception as e:
+			print('No face embedding for speaker', i, e)
 	'''TODO: use Google Vision AI to find the face embedding for each speaker'''
 	
 	
@@ -380,9 +351,9 @@ def run_predict(video_name=VIDEO_NAME):
 
 	# '''Predict data'''
 	cRMs = AV_model.predict([mix_expand, face_embs])
+	cRMs = cRMs[0]
 
 	# '''Save output as wav'''
-	cRMs = cRMs[0]
 	for j in range(num_people):
 		cRM = cRMs[:,:,:,j]
 		assert cRM.shape == (298,257,2)
