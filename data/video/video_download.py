@@ -95,7 +95,7 @@ def download_video_frames(loc,cat,start_idx,end_idx,rm_video):
         os.system(command)
 
 def download_video(loc='video_train',path='../audio/catalog/avspeech_train.csv',start_idx=0,end_idx=1,rm_video=True):
-    # TODO: Inconsistent conditions??
+    # Inconsistent conditions - inclusive vs exclusive of end id
     end_idx -= 1
     
     avh.mkdir('video_train')

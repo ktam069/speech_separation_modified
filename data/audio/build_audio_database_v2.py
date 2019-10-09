@@ -101,8 +101,11 @@ def split_to_mix(audio_path_list,database_repo=DATABASE_REPO_PATH,partition=2):
     head = 0
     part_idx = 0
     split_list = []
-    while((head+part_len)<length):
+    # print(np.array(audio_path_list).shape)
+    while((head+part_len)<=length):
+        # print(head,(head+part_len))
         part = audio_path_list[head:(head+part_len)]
+        # print(np.array(part).shape)
         split_list.append(part)
         with open('%s/single_TF_part%d.txt'%(database_repo,part_idx),'a') as f:
             for idx, _ in part:
@@ -112,8 +115,8 @@ def split_to_mix(audio_path_list,database_repo=DATABASE_REPO_PATH,partition=2):
         head += part_len
         part_idx += 1
 
-        # Note: prevent the program from running indefinitely - should refine condition
-        if part_idx > 99:
+        # Note: prevent the program from running indefinitely - added by King
+        if part_idx > NUM_SPEAKER:
             print("\n\n == Error: split_to_mix failed... == \n\n")
             break
 
@@ -250,8 +253,12 @@ def train_test_split(dataset_log_path,data_range=[0,50000],test_ratio=0.1,shuffl
 def build_database(sample_range=SAMPLE_RANGE):
     init_dir()
     audio_path_list = generate_path_list(sample_range)
+    # print(audio_path_list)
+    print(np.array(audio_path_list).shape)
     single_audio_to_npy(audio_path_list)
     split_list = split_to_mix(audio_path_list,partition=NUM_SPEAKER)
+    # print(split_list)
+    print(np.array(split_list).shape)
     all_mix(split_list,partition=NUM_SPEAKER)
 
     mix_log_path = '%s/mix_log.txt'%DATABASE_REPO_PATH
