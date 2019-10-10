@@ -5,11 +5,9 @@
 # ==========================================================
 '''
 
-
 import sys
 sys.path.append('../lib')
 from tensorflow.keras.models import load_model
-from model_ops import ModelMGPU
 import os
 import scipy.io.wavfile as wavfile
 import numpy as np
@@ -17,7 +15,6 @@ import tensorflow as tf
 import librosa
 
 from keras.models import Model
-
 from mtcnn.mtcnn import MTCNN
 import cv2
 import matplotlib.pyplot as plt		# used for testing (visualising) purposes only
@@ -28,6 +25,9 @@ import matplotlib.image as mpimg
 '''Note that the code from the utils script is needed (found under model/lib/)'''
 import utils
 
+'''
+# ==========================================================
+'''
 
 # super parameters
 num_people = 2
@@ -154,18 +154,34 @@ def generate_frames(video_name=VIDEO_NAME, fps=25):
 # ==========================================================
 '''
 
+tmp_face_x = [-1]*num_people
+tmp_face_y = [-1]*num_people
+
 def face_detect(file,detector):
 	name = file.replace('.jpg', '').split('-')
 	
 	img = cv2.imread('%s%s'%(dir_path_frames,file))
 	faces = detector.detect_faces(img)
 	
+	offset = 0
+	
 	for i in range(num_people):
+		j = (i+offset) % num_people
+		
 		# check if detected faces
-		if(len(faces)<=i or faces[i]['confidence']<0.5):
+		if(len(faces)<=i or faces[i]['confidence']<0.6):
 			print('Could not detect face for speaker no. %d: %s'%(i+1,file))
 			return
-		bounding_box = faces[i]['box']
+		
+		bounding_box = faces[j]['box']
+		'''Dealing with permutation problem of faces'''
+		while tmp_face_x[i] >= 0 and (abs(tmp_face_x[i] - bounding_box[0]) > 100 or abs(tmp_face_y[i] - bounding_box[1]) > 100):
+			offset += 1
+			if offset >= num_people:
+				break
+			j = (i+offset) % num_people
+			bounding_box = faces[j]['box']
+		
 		bounding_box[1] = max(0, bounding_box[1])
 		bounding_box[0] = max(0, bounding_box[0])
 		print(file," ",bounding_box)
@@ -176,6 +192,18 @@ def face_detect(file,detector):
 		# crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
 		# plt.imshow(crop_img)
 		# plt.show()
+		
+		'''Dealing with permutation problem of faces'''
+		tmp_face_x[i] = bounding_box[0]
+		tmp_face_y[i] = bounding_box[1]
+		
+		'''Write images with faces outlined - for demo purposes'''
+		cv2.rectangle(img,
+			(bounding_box[0], bounding_box[1]),
+			(bounding_box[0]+bounding_box[2], bounding_box[1] + bounding_box[3]),
+			(0,155,255),
+			2)
+	cv2.imwrite('%s/demo_frame_'%dir_path_frames + name[0] + '_' + name[1] + '.jpg', img)
 
 
 def mtcnn_detect(video_name, video_length=3, fps=25):
