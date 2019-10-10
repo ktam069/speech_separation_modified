@@ -33,7 +33,7 @@ import utils
 num_people = 2
 
 # PATH
-VIDEO_NAME = "test_vid_1"
+VIDEO_NAME = "test_vid_6"
 VIDEO_FILEPATH = "./"+VIDEO_NAME+".mp4"
 MODEL_PATH = './AVmodel-2p-002-0.87080.h5'	# 234K
 MODEL_PATH_FACENET = 'FaceNet_keras/facenet_keras.h5'
@@ -229,9 +229,9 @@ def facenet_detect(video_name=VIDEO_NAME):
 	avgPool_layer_model = Model(inputs=model.input,outputs=model.get_layer('AvgPool').output)
 	# print(avgPool_layer_model.predict(data))
 
-	for i in range(num_people):
+	for j in range(num_people):
 		try:
-			line = "frame_"+video_name+'_p%d'%i
+			line = "frame_"+video_name+'_p%d'%j
 			
 			embtmp = np.zeros((75, 1, 1792))
 			headname = line.strip()
@@ -253,14 +253,14 @@ def facenet_detect(video_name=VIDEO_NAME):
 			# print(embtmp.shape)
 			# people_index = int(line.strip().split('_')[1])
 			# npname = '{:05d}_face_emb.npy'.format(people_index)
-			npname = '%s_face_emb_p%d.npy'%(video_name,i)
+			npname = '%s_face_emb_p%d.npy'%(video_name,j)
 			print(npname)
 
 			np.save(dir_path_face_embs + npname, embtmp)
 			with open('faceemb_dataset.txt', 'a') as d:
 				d.write(npname + '\n')
 		except Exception as e:
-			print('No face input for speaker', i, e)
+			print('No face input for speaker', j, "\n", e)
 	
 	print("Finished running FaceNet...")
 
@@ -328,6 +328,10 @@ def run_predict(video_name=VIDEO_NAME):
 	print(audio_data.shape)
 	# TODO: check shape - first dim should be 298
 	audio_data = audio_data[:298]
+	if len(audio_data) < 298:
+		a = np.zeros((298,257,2))
+		a[:len(audio_data),:,:] = audio_data
+		audio_data = a
 	print(audio_data.shape)
 	mix_expand = np.expand_dims(audio_data, axis=0)
 	print(mix_expand.shape)
@@ -341,7 +345,7 @@ def run_predict(video_name=VIDEO_NAME):
 			'''Currently does not use the correct face input for both speakers (uses the same images for both right now)'''
 			face_embs[0,:,:,:,i] = np.load(dir_path_face_embs+"%s_face_emb_p%d.npy"%(video_name,i))
 		except Exception as e:
-			print('No face embedding for speaker', i, e)
+			print('No face embedding for speaker', i, "\n", e)
 	'''TODO: use Google Vision AI to find the face embedding for each speaker'''
 	
 	

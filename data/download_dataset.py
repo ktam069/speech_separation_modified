@@ -19,7 +19,7 @@ from gentxtnew import main as gentxtnew
 
 # Range of data to download from AVSpeech (excludes end_id(?))
 start_id = 0
-end_id = 101
+end_id = 301
 
 # Whether to download from the training set or the test set
 dl_from_training = True
@@ -79,10 +79,10 @@ def main():
 	
 	# Generate database from audio and visual data
 	os.chdir("../audio")
-	# build_AV_databases()
+	build_AV_databases()
 	
 	os.chdir("../AV_log")
-	# gentxtnew()
+	gentxtnew()
 	
 	# Then:
 	# Run model/pretrain_model/pretrain_load_test.py
