@@ -1,9 +1,11 @@
-# Changes
+(Adapted from: https://github.com/bill9800/speech_separation)
+
+# Consolidated script
 Steps 2-7* can be run by calling:
 ```
 python download_dataset.py
 ```
-*Step 8 currently has to be done manually.
+*Steps 1 & 8 currently has to be done manually.
 
 # Instruction for generating data
 
