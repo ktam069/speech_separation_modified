@@ -22,6 +22,9 @@ Steps 2-7* can be done by running the **python download_dataset.py** script as o
     ```python
     python download_dataset.py
     ```
+3.  Download [keras facenet model](https://github.com/nyoki-mtl/keras-facenet) as facenet_keras.h5 and put it in **model/pretrain_model/FaceNet_keras**.
+
+4.  Run **model/pretrain_model/pretrain_load_test.py** and copy the outputted **face1022_emb** folder to **\data\video**, renaming the folder to **face_emb**.
 
 # More detailed steps
 
@@ -118,20 +121,4 @@ Following are the steps to generate training and testing data.  There are severa
 3. Open **model/pretrain_model/pretrain_load_test.py**
 4. Change the parameters for different path. 
 5. Run it. Face Embedding numpy files will store in **face1022_emb**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
