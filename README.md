@@ -30,7 +30,7 @@ Python 3.6
 
 * sox
 
-To install all the required libraries listed above, run the following command from the *ai_project* folder:
+To install all the required libraries listed above, run the following command:
 
 ```
 python -m pip install -r requirements.txt
