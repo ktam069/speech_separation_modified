@@ -1,13 +1,31 @@
-(Adapted from: https://github.com/bill9800/speech_separation)
+# Instructions for downloading data
 
-# Consolidated script
-Steps 2-7* can be run by calling:
-```
-python download_dataset.py
-```
-*Steps 1 & 8 currently has to be done manually.
+The code was adapted from: https://github.com/bill9800/speech_separation/tree/master/data
 
-# Instruction for generating data
+The instructions below detail the steps used to download the training and testing data from the AVSpeech dataset, and to create a database of the data to feed into the training generator.
+
+Steps 2-7* can be done by running the **python download_dataset.py** script as outlined below.
+
+*Steps 1 & 8 currently have to be done manually.
+
+## Step 1 - Get a list of the AVSpeech files
+
+1. Go into **data/audio/catalog** and download **avspeech_train.csv** and **avspeech_test.csv** from [AVSpeech](https://looking-to-listen.github.io/avspeech/download.html)
+2. Add **link,start_time,end_time,pos_x,pos_y** to the head of the csv files. (for pandas) 
+
+## Step 2 - Download audio and video data
+
+1.  Open **data/download_dataset.py**. Modify the settings to choose the range of the data in AVspeech dataset to download (by changing the **start_id** and **end_id**).
+
+2.  Run the script from the command line:
+
+    ```python
+    python download_dataset.py
+    ```
+
+# More detailed steps
+
+(Note that download_dataset.py does steps 2-7 listed below.)
 
 Following are the steps to generate training and testing data.  There are several parameters to change in order to match different purpose. 
 
