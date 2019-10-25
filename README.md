@@ -62,7 +62,7 @@ python download_dataset.py
 ```
 from within the data folder.
 
-### Trainning the Model
+### Training the Model
 
 After having downloaded a range of data into the data folder, the audiovisual model can be trained or ran.
 
