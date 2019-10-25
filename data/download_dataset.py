@@ -71,18 +71,18 @@ def build_AV_databases():
 def main():
 	# Download and process audio data from links
 	os.chdir("./audio")
-	# process_audio()
+	process_audio()
 	
 	# Download and process video data from links
 	os.chdir("../video")
-	# process_video()
+	process_video()
 	
 	# Generate database from audio and visual data
 	os.chdir("../audio")
-	# build_AV_databases()
+	build_AV_databases()
 	
 	os.chdir("../AV_log")
-	# gentxtnew()
+	gentxtnew()
 	
 	# Then:
 	# Run model/pretrain_model/pretrain_load_test.py
