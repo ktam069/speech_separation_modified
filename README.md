@@ -1,62 +1,91 @@
 # Google Audiovisual Model
 
-A modified version of https://github.com/bill9800/speech_separation (adapted for Part IV Project #80)
+## Description
+
+Adapted version of the model for for Part IV Project #80 (2019). Commands are adpated to be run on windows.
+
+A modified version of https://github.com/bill9800/speech_separation (adapted for Part IV Project #80).
+
+## Dependencies
+
+To run this project fully, the following libraries and tools are required.
+
+### Language and version:
+
+Python 3.6
+
+### Download and install:
+
+**Use pip install:**
+
+* keras
+
+* tensorflow
+
+* librosa
+
+* youtube-dl
+
+* pytest
+
+* sox
+
+To install all the required libraries listed above, run the following command from the *ai_project* folder:
+
+```
+python -m pip install -r requirements.txt
+```
+
+**Install manually:**
+
+* ffmpeg
+
+* cmake
+
+**Ensure that the following are in your system path environment variables:**
+
+* ...\Python\Scripts
+
+* ...\ffmpeg\bin
+
+* ...\sox
+
+## Instructions for Running
+
+### Dataset
+
+Follow the instructions on the [README](https://github.com/ktam069/Audio-visual_speech_separation_basic/tree/master/data) in the data folder.
 
 Steps 2-7* for data downloading can be run by calling:
 ```
 python download_dataset.py
 ```
-from within that data folder.
+from within the data folder.
 
-# Overview
+### Trainning the Model
 
-This is a project to improve the speech separation task. In this project, Audio-only and Audio-Visual deep learning separation models are modified based on the paper [Lookng to Listen at the Cocktail Party](https://arxiv.org/abs/1804.03619)[1]. 
+After having downloaded a range of data into the data folder, the audiovisual model can be trained or ran.
 
-# Data
+From within **/model/model_v2**, run the following to train the model:
 
-[AVspeech dataset](https://looking-to-listen.github.io/) : contains 4700 hours of video segments, from a total of 290k YouTube videos.
+```python
+python AV_train.py
+```
 
-Customized video and audio downloader are provided in [audio](https://github.com/bill9800/speech_separation/tree/master/data/audio) and [video](https://github.com/bill9800/speech_separation/tree/master/data/video). (based on youtube-dl,sox,ffmpeg)  
+### Using the Trained Model
 
-Instrouction for generating data is under [Data](https://github.com/bill9800/speech_separation/tree/master/data/README.md). 
-# Preprocessing
+Put the saved H5 model file into the **/model/model_v2** directory, and change the model path parameter in **predict_video.py**	to the correct name.
 
-There are several preprocess functions in the [utils](https://github.com/bill9800/speech_separation/tree/master/model/lib). Including STFT, iSTFT, power-law compression, complex mask and modified hyperbolic tangent[5] etc. Below is the preprocessing for audio data:
+From within **/model/model_v2**, run the following to download a test video:
 
-![](img/audio.png)
+```python
+python download_test_video.py
+```
 
-For the visual part, MTCNN is applied to detect face and correct it by checking the provided face center[2]. The visual frames are transfered to 1792 (lowest layer in the network that is not spatially varying) face embeddings features with pre-trained FaceNet model[3]. Below is the preprocessing for visual data:
+From within **/model/model_v2**, run the following to run the demo:
 
-![](img/video.png)
+```python
+python predict_video.py
+```
 
-# Model
-
-Audio-only model is provided in [model_v1](https://github.com/bill9800/speech_separation/tree/master/model/model_v1) and Audio-visual model is provided in [model_v2](https://github.com/bill9800/speech_separation/tree/master/model/model_v2).
-
-Follwing is the brief structure of Audio-Visual model, some layers are revised corresponding to our customized compression and dataset.[1] 
-
-![](img/network.jpg)
-
-# Training 
-
-Loss function : modified discriminative loss function inspired from paper[4].
-
-Optimizer : Adam 
-
-# Prediction
-
-Apply complex ratio mask (cRM) to STFT of the mixed speech, we can produce the STFT of single speaker’s speech.
-
-Samples to complete the prediction are provided in eval file in [model_v1](https://github.com/bill9800/speech_separation/tree/master/model/model_v1) and [model_v2](https://github.com/bill9800/speech_separation/tree/master/model/model_v2).
-
-# Reference
-
-[1] [Lookng to Listen at the Cocktail Party:A Speaker-Independent Audio-Visual Model for Speech Separation, A. Ephrat et al., arXiv:1804.03619v2 [cs.SD] 9 Aug 2018](https://arxiv.org/abs/1804.03619)
-
-[2] [MTCNN face detection](https://github.com/ipazc/mtcnn)
-
-[3] [FaceNet Pretrained model](https://github.com/davidsandberg/facenet)
-
-[4] [Joint Optimization of Masks and Deep Recurrent Neural Networks for Monaural Source Separation, P. Hunag et al,arXiv:1502.04149v4 [cs.SD] 1 Oct 2015](https://arxiv.org/abs/1502.04149)
-
-[5] [Complex Ratio Masking for Monaural Speech Separation](https://ieeexplore.ieee.org/document/7364200)
+The outputted clean audio files will be found in the **pred** folder.
