@@ -1,5 +1,6 @@
-# Modified for Part IV - speech_separation
-(Original: https://github.com/bill9800/speech_separation)
+# Google Audiovisual Model
+
+A modified version of https://github.com/bill9800/speech_separation (adapted for Part IV Project #80)
 
 Steps 2-7* for data downloading can be run by calling:
 ```
